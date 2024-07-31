@@ -1,7 +1,7 @@
 import requests
 
 SERVER_URL = "https://chat.ifsvivek.tech/ollama/api/generate"  # Define your server URL
-API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Ijg2YzI2ZDk2LTVlOTMtNDUxYS05ZDdkLTQ0ZDk1ODdmNGYyZSJ9.AkSIm1NsNqTqzUpUaVYL2FF8mfdVrqcWGGl7Zmzm1No"  # Define your API key
+API_KEY = "YOUR_KEY_ENTER"  # Define your API key
 MODEL_NAME = "llama3.1:latest"  # Define your model name
 
 def generate_response(prompt):
