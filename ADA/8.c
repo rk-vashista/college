@@ -2,7 +2,7 @@
 #include <stdbool.h>
 
 // Function to print a subset
-void printSubset(int arr[], int subset[], int subsetSize) {
+void printSubset( int subset[], int subsetSize) {
     printf("{ ");
     for (int i = 0; i < subsetSize; i++) {
         printf("%d ", subset[i]);
@@ -14,7 +14,7 @@ void printSubset(int arr[], int subset[], int subsetSize) {
 void findSubsetsWithSum(int arr[], int n, int sum, int subset[], int subsetSize) {
     // Base case
     if (sum == 0) {
-        printSubset(arr, subset, subsetSize);
+        printSubset( subset, subsetSize);
         return;
     }
     if (n == 0 || sum < 0) return;
