@@ -1,67 +1,57 @@
 #include <stdio.h>
 #include <limits.h>
 
-#define MAX 100
+#define V 5 
 
-int findMinVertex(int cost[], int visited[], int V) {
+int graph[V][V] = {
+    {0, 2, 3, 1},
+    {2, 0, 4,0},
+    {3,4, 0,5},
+    {1, 0, 5, 0}
+};
+
+int visited[V] = {0};
+int parent[V];
+int totalCost = 0; // To store the total cost of the MST
+
+int minKey(int key[], int mstSet[]) {
     int min = INT_MAX, minIndex;
     for (int v = 0; v < V; v++) {
-        if (visited[v] == 0 && cost[v] < min) {
-            min = cost[v];
+        if (mstSet[v] == 0 && key[v] < min) {
+            min = key[v];
             minIndex = v;
         }
     }
     return minIndex;
 }
 
-void primMST(int graph[MAX][MAX], int V) {
-    int parent[V]; 
-    int cost[V];   
-    int visited[V];  
-
+void primMST() {
+    int key[V]; 
     for (int i = 0; i < V; i++) {
-        cost[i] = INT_MAX;
-        visited[i] = 0;
+        key[i] = INT_MAX;
+        parent[i] = -1;
     }
 
-    cost[0] = 0;      
-    parent[0] = -1;   
+    key[0] = 0; 
 
     for (int count = 0; count < V - 1; count++) {
-        int u = findMinVertex(cost, visited, V);
-        visited[u] = 1;
+        int u = minKey(key, visited); 
+        visited[u] = 1; 
+
+        printf("%d - %d\n", parent[u], u); 
+        totalCost += key[u]; // Add the edge weight to the total cost
 
         for (int v = 0; v < V; v++) {
-            if (graph[u][v] && visited[v] == 0 && graph[u][v] < cost[v]) {
-                parent[v] = u;
-                cost[v] = graph[u][v];
+            if (graph[u][v] && visited[v] == 0 && graph[u][v] < key[v]) {
+                parent[v] = u; 
+                key[v] = graph[u][v]; 
             }
         }
     }
-
-    int totalCost = 0;
-    printf("Edge \tWeight\n");
-    for (int i = 1; i < V; i++) {
-        printf("%d - %d \t%d \n", parent[i], i, graph[i][parent[i]]);
-        totalCost += graph[i][parent[i]];
-    }
-    printf("Total cost of MST: %d\n", totalCost);
 }
 
 int main() {
-    int V;
-    printf("Enter the number of vertices: ");
-    scanf("%d", &V);
-
-    int graph[MAX][MAX];
-    printf("Enter the cost matrix:\n");
-    for (int i = 0; i < V; i++) {
-        for (int j = 0; j < V; j++) {
-            scanf("%d", &graph[i][j]);
-        }
-    }
-
-    primMST(graph, V);
-
+    primMST();
+    printf("Total cost of MST: %d\n", totalCost);
     return 0;
 }

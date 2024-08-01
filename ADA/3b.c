@@ -1,49 +1,49 @@
 #include <stdio.h>
 
-#define MAX 100
+#define V 4 // Number of vertices
 
-void printSolution(int reach[MAX][MAX], int V) {
-    printf("The transitive closure of the given graph is:\n");
-    for (int i = 0; i < V; i++) {
-        for (int j = 0; j < V; j++) {
-            printf("%d ", reach[i][j]);
+void warshal(int graph[V][V]) {
+    int i, j, k;
+
+    // Create a copy of the graph
+    int transitiveClosure[V][V];
+    for (i = 0; i < V; i++) {
+        for (j = 0; j < V; j++) {
+            transitiveClosure[i][j] = graph[i][j];
+        }
+    }
+
+    // Apply Warshal's algorithm
+    for (k = 0; k < V; k++) {
+        for (i = 0; i < V; i++) {
+            for (j = 0; j < V; j++) {
+                transitiveClosure[i][j] = transitiveClosure[i][j] || (transitiveClosure[i][k] && transitiveClosure[k][j]);
+            }
+        }
+    }
+
+    // Print the transitive closure
+    for (i = 0; i < V; i++) {
+        for (j = 0; j < V; j++) {
+            if (transitiveClosure[i][j]) {
+                printf("1 ");
+            } else {
+                printf("0 ");
+            }
         }
         printf("\n");
     }
 }
 
-void warshall(int graph[MAX][MAX], int V) {
-    int reach[MAX][MAX];
-
-    for (int i = 0; i < V; i++)
-        for (int j = 0; j < V; j++)
-            reach[i][j] = graph[i][j];
-
-    for (int k = 0; k < V; k++) {
-        for (int i = 0; i < V; i++) {
-            for (int j = 0; j < V; j++) {
-                reach[i][j] = reach[i][j] || (reach[i][k] && reach[k][j]);
-            }
-        }
-    }
-
-    printSolution(reach, V);
-}
-
 int main() {
-    int V;
-    printf("Enter the number of vertices: ");
-    scanf("%d", &V);
+    int graph[V][V] = {
+        {1, 1, 0, 0},
+        {0, 1, 1, 0},
+        {0, 0, 1, 1},
+        {0, 0, 0, 1}
+    };
 
-    int graph[MAX][MAX];
-    printf("Enter the adjacency matrix:\n");
-    for (int i = 0; i < V; i++) {
-        for (int j = 0; j < V; j++) {
-            scanf("%d", &graph[i][j]);
-        }
-    }
-
-    warshall(graph, V);
+    warshal(graph);
 
     return 0;
 }

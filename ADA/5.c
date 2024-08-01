@@ -1,77 +1,67 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MAX 100
+#define V 5 // Number of vertices
 
-// Stack structure for topological sorting
-struct Stack {
-    int items[MAX];
-    int top;
-};
+// Structure to represent a graph
+typedef struct {
+    int V;
+    int *adj;
+} Graph;
 
-void initStack(struct Stack* stack) {
-    stack->top = -1;
-}
-
-void push(struct Stack* stack, int value) {
-    stack->items[++(stack->top)] = value;
-}
-
-int pop(struct Stack* stack) {
-    if (stack->top == -1) {
-        return -1;
-    }
-    return stack->items[(stack->top)--];
-}
-
-// Function to perform DFS and push vertices into the stack
-void dfs(int v, int visited[], struct Stack* stack, int graph[MAX][MAX], int V) {
-    visited[v] = 1;
+// Function to create a graph
+Graph* createGraph(int V) {
+    Graph* graph = (Graph*)malloc(sizeof(Graph));
+    graph->V = V;
+    graph->adj = (int*)malloc(V * sizeof(int));
     for (int i = 0; i < V; i++) {
-        if (graph[v][i] && !visited[i]) {
-            dfs(i, visited, stack, graph, V);
+        graph->adj[i] = 0;
+    }
+    return graph;
+}
+
+// Function to add an edge to the graph
+void addEdge(Graph* graph, int u, int v) {
+    graph->adj[u] = v;
+}
+
+// Function to perform DFS
+void DFS(Graph* graph, int v, int* visited, int* stack) {
+    visited[v] = 1;
+    for (int i = 0; i < graph->V; i++) {
+        if (graph->adj[v] == i && !visited[i]) {
+            DFS(graph, i, visited, stack);
         }
     }
-    push(stack, v);
+    stack[graph->V - 1] = v;
+    graph->V--;
 }
 
-// Function to perform topological sort
-void topologicalSort(int graph[MAX][MAX], int V) {
-    struct Stack stack;
-    initStack(&stack);
-    int visited[V];
-    
-    for (int i = 0; i < V; i++) {
+// Function to perform Topological Sort
+void TopologicalSort(Graph* graph) {
+    int* visited = (int*)malloc(graph->V * sizeof(int));
+    int* stack = (int*)malloc(graph->V * sizeof(int));
+    for (int i = 0; i < graph->V; i++) {
         visited[i] = 0;
     }
-
-    for (int i = 0; i < V; i++) {
+    for (int i = 0; i < graph->V; i++) {
         if (!visited[i]) {
-            dfs(i, visited, &stack, graph, V);
+            DFS(graph, i, visited, stack);
         }
     }
-
-    printf("Topological ordering of vertices: ");
-    while (stack.top != -1) {
-        printf("%d ", pop(&stack));
+    printf("Topological Order: ");
+    for (int i = 0; i < graph->V; i++) {
+        printf("%d ", stack[i]);
     }
     printf("\n");
 }
 
 int main() {
-    int V;
-    printf("Enter the number of vertices: ");
-    scanf("%d", &V);
-
-    int graph[MAX][MAX];
-    printf("Enter the adjacency matrix:\n");
-    for (int i = 0; i < V; i++) {
-        for (int j = 0; j < V; j++) {
-            scanf("%d", &graph[i][j]);
-        }
-    }
-
-    topologicalSort(graph, V);
-
+    Graph* graph = createGraph(5);
+    addEdge(graph, 0, 1);
+    addEdge(graph, 1, 2);
+    addEdge(graph, 2, 3);
+    addEdge(graph, 3, 4);
+    TopologicalSort(graph);
     return 0;
 }

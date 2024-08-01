@@ -1,141 +1,78 @@
 #include <stdio.h>
-#include <stdlib.h>
+#include <limits.h>
+
+#define V 5 // Number of vertices
 
 // Structure to represent an edge
-struct Edge {
-    int src, dest, weight;
-};
+typedef struct {
+    int u, v, weight;
+} Edge;
 
-// Structure to represent a graph
-struct Graph {
-    int V, E;
-    struct Edge* edge;
-};
-
-// Create a graph with V vertices and E edges
-struct Graph* createGraph(int V, int E) {
-    struct Graph* graph = (struct Graph*)malloc(sizeof(struct Graph));
-    graph->V = V;
-    graph->E = E;
-    graph->edge = (struct Edge*)malloc(E * sizeof(struct Edge));
-    return graph;
+// Function to find the parent of a vertex in the disjoint set
+int find(int parent[], int i) {
+    if (parent[i] == i)
+        return i;
+    return find(parent, parent[i]);
 }
 
-// A structure to represent a subset for union-find
-struct subset {
-    int parent;
-    int rank;
-};
+// Function to perform union of two sets in the disjoint set
+void unionSet(int parent[], int rank[], int x, int y) {
+    int xroot = find(parent, x);
+    int yroot = find(parent, y);
 
-// A utility function to find set of an element i (uses path compression technique)
-int find(struct subset subsets[], int i) {
-    if (subsets[i].parent != i)
-        subsets[i].parent = find(subsets, subsets[i].parent);
-    return subsets[i].parent;
-}
-
-// A function that does union of two sets of x and y (uses union by rank)
-void Union(struct subset subsets[], int x, int y) {
-    int xroot = find(subsets, x);
-    int yroot = find(subsets, y);
-
-    if (subsets[xroot].rank < subsets[yroot].rank)
-        subsets[xroot].parent = yroot;
-    else if (subsets[xroot].rank > subsets[yroot].rank)
-        subsets[yroot].parent = xroot;
+    if (rank[xroot] < rank[yroot])
+        parent[xroot] = yroot;
+    else if (rank[xroot] > rank[yroot])
+        parent[yroot] = xroot;
     else {
-        subsets[yroot].parent = xroot;
-        subsets[xroot].rank++;
+        parent[yroot] = xroot;
+        rank[xroot]++;
     }
 }
 
-// Compare two edges according to their weights. Used in qsort() for sorting edges
-int compare(const void* a, const void* b) {
-    struct Edge* a1 = (struct Edge*)a;
-    struct Edge* b1 = (struct Edge*)b;
-    return a1->weight > b1->weight;
-}
+// Function to implement Kruskal's algorithm
+void kruskal(Edge edges[], int numVertices) {
+    int parent[numVertices], rank[numVertices];
+    int i, e = 0;
+    int minimumCost = 0;
 
-// The main function to construct MST using Kruskal's algorithm
-void KruskalMST(struct Graph* graph) {
-    int V = graph->V;
-    struct Edge result[V];
-    int e = 0;
-    int i = 0;
-    int totalCost = 0;
-
-    qsort(graph->edge, graph->E, sizeof(graph->edge[0]), compare);
-
-    struct subset* subsets = (struct subset*)malloc(V * sizeof(struct subset));
-
-    for (int v = 0; v < V; ++v) {
-        subsets[v].parent = v;
-        subsets[v].rank = 0;
+    // Initialize the disjoint set
+    for (i = 0; i < numVertices; i++) {
+        parent[i] = i;
+        rank[i] = 0;
     }
 
-    while (e < V - 1 && i < graph->E) {
-        struct Edge next_edge = graph->edge[i++];
+    // Sort the edges in non-decreasing order of their weights
+    for (i = 0; i < numVertices - 1; i++) {
+        int min = i;
+        for (int j = i + 1; j < numVertices; j++) {
+            if (edges[j].weight < edges[min].weight)
+                min = j;
+        }
+        Edge temp = edges[i];
+        edges[i] = edges[min];
+        edges[min] = temp;
+    }
 
-        int x = find(subsets, next_edge.src);
-        int y = find(subsets, next_edge.dest);
+    // Find the MST
+    for (i = 0; i < numVertices - 1; i++) {
+        int x = find(parent, edges[i].u);
+        int y = find(parent, edges[i].v);
 
         if (x != y) {
-            result[e++] = next_edge;
-            Union(subsets, x, y);
-            totalCost += next_edge.weight;
+            minimumCost += edges[i].weight;
+            printf("%d - %d\n", edges[i].u, edges[i].v);
+            unionSet(parent, rank, x, y);
         }
     }
 
-    printf("Following are the edges in the constructed MST\n");
-    for (i = 0; i < e; ++i)
-        printf("%d -- %d == %d\n", result[i].src, result[i].dest, result[i].weight);
-
-    printf("Total cost of MST: %d\n", totalCost);
-    free(subsets);
+    printf("Minimum Cost: %d\n", minimumCost);
 }
 
-// Driver program to test above functions
 int main() {
-    int V;
-    printf("Enter the number of vertices: ");
-    scanf("%d", &V);
+    Edge edges[] = {{0, 1, 10}, {0, 2, 6}, {0, 3, 5}, {1, 3, 15}, {2, 3, 4}};
 
-    int costMatrix[V][V];
-    printf("Enter the cost matrix:\n");
-    for (int i = 0; i < V; i++) {
-        for (int j = 0; j < V; j++) {
-            scanf("%d", &costMatrix[i][j]);
-        }
-    }
-
-    // Count the number of edges
-    int E = 0;
-    for (int i = 0; i < V; i++) {
-        for (int j = i + 1; j < V; j++) {
-            if (costMatrix[i][j] != 0) {
-                E++;
-            }
-        }
-    }
-
-    struct Graph* graph = createGraph(V, E);
-
-    int edgeIndex = 0;
-    for (int i = 0; i < V; i++) {
-        for (int j = i + 1; j < V; j++) {
-            if (costMatrix[i][j] != 0) {
-                graph->edge[edgeIndex].src = i;
-                graph->edge[edgeIndex].dest = j;
-                graph->edge[edgeIndex].weight = costMatrix[i][j];
-                edgeIndex++;
-            }
-        }
-    }
-
-    KruskalMST(graph);
-
-    free(graph->edge);
-    free(graph);
+    kruskal(edges, V);
 
     return 0;
 }
