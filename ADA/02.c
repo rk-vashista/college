@@ -1,57 +1,54 @@
 #include <stdio.h>
-#include <limits.h>
 
-#define V 5 
+int cost[10][10], n;
 
-int graph[V][V] = {
-    {0, 2, 3, 1},
-    {2, 0, 4,0},
-    {3,4, 0,5},
-    {1, 0, 5, 0}
-};
+void prim() {
+    int visited[10] = {0}; // Track visited vertices
+    int mincost = 0, ne = 0; // Minimum cost and number of edges in MST
 
-int visited[V] = {0};
-int parent[V];
-int totalCost = 0; // To store the total cost of the MST
+    // Start from the first vertex
+    visited[0] = 1;
 
-int minKey(int key[], int mstSet[]) {
-    int min = INT_MAX, minIndex;
-    for (int v = 0; v < V; v++) {
-        if (mstSet[v] == 0 && key[v] < min) {
-            min = key[v];
-            minIndex = v;
-        }
-    }
-    return minIndex;
-}
+    while (ne < n - 1) {
+        int min = 999, a = -1, b = -1;
 
-void primMST() {
-    int key[V]; 
-    for (int i = 0; i < V; i++) {
-        key[i] = INT_MAX;
-        parent[i] = -1;
-    }
-
-    key[0] = 0; 
-
-    for (int count = 0; count < V - 1; count++) {
-        int u = minKey(key, visited); 
-        visited[u] = 1; 
-
-        printf("%d - %d\n", parent[u], u); 
-        totalCost += key[u]; // Add the edge weight to the total cost
-
-        for (int v = 0; v < V; v++) {
-            if (graph[u][v] && visited[v] == 0 && graph[u][v] < key[v]) {
-                parent[v] = u; 
-                key[v] = graph[u][v]; 
+        // Find the nearest neighbor
+        for (int i = 0; i < n; i++) {
+            if (visited[i]) {
+                for (int j = 0; j < n; j++) {
+                    if (!visited[j] && cost[i][j] < min) {
+                        min = cost[i][j];
+                        a = i;
+                        b = j;
+                    }
+                }
             }
         }
+
+        // Include the nearest neighbor in the MST
+        if (a != -1 && b != -1) {
+            printf("Edge from vertex %d to vertex %d with cost %d\n", a, b, min);
+            visited[b] = 1;
+            ne++;
+            mincost += min;
+            cost[a][b] = cost[b][a] = 999; // Mark this edge as used
+        }
     }
+
+    printf("Minimum spanning tree cost is %d\n", mincost);
 }
 
 int main() {
-    primMST();
-    printf("Total cost of MST: %d\n", totalCost);
+    printf("Enter the number of vertices: ");
+    scanf("%d", &n);
+
+    printf("Enter the cost matrix:\n");
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            scanf("%d", &cost[i][j]);
+        }
+    }
+
+    prim();
     return 0;
 }
