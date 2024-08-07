@@ -2,62 +2,48 @@
 
 int cost[10][10],n;
 
-void kruskal(){
-    int parent[10];
+void prims(){
+    int visited[10]={0};
     int mincost=0,ne=0;
 
-    for (int i = 0; i < n; i++)
-    {
-        parent[i]=-1;
-    }
+    visited[0]=1;
 
-    while(ne < n-1){
-        int min=999,u=-1,v=-1;
+    while(ne<n-1){
+        int min=999, a=-1,b=-1;
 
         for(int i=0;i<n;i++){
-            for(int j=0;j<n;j++){
-                if(cost[i][j]<min){
-                    min =cost[i][j];
-                    u=i;
-                    v=j;
+            if(visited[i]){
+                for(int j=0;j<n;j++){
+                    if(!visited[j] && cost[i][j]<min){
+                        min=cost[i][j];
+                        a=i;
+                        b=j;
+                    }
                 }
             }
         }
 
-        int root_u=u,root_v=v;
-
-        while(parent[root_u]!=-1){
-            root_u=parent[root_u];
-        }
-         while(parent[root_v]!=-1){
-            root_v=parent[root_v];
-        }
-
-        if(root_u!=root_v){
-            printf("Edge %d to %d | Cost: %d \n",u,v,min);
-            ne++;
+        if(a!=-1 && b!=-1){
+            printf("Edge from %d to %d| Cost: %d \n", a,b,min);
             mincost+=min;
-            parent[root_v]=root_u;
+            ne++;
+            visited[b]=1;
+            cost[a][b]=cost[b][a]=999;
         }
-
-        cost[u][v]=cost[v][u]=999;
     }
-
-    printf("Mininmum COst : %d",mincost);
-    
+    printf("The total cost is %d ",mincost);
 }
 
-int main() {
+void main(){
     printf("Enter the number of vertices: ");
-    scanf("%d", &n);
+    scanf("%d",&n);
 
-    printf("Enter the cost matrix:\n");
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            scanf("%d", &cost[i][j]);
+    printf("Enter the cost matrix \n");
+    for(int i=0;i<n;i++){
+        for(int j=0;j<n;j++){
+            scanf("%d",&cost[i][j]);
         }
     }
 
-    kruskal();
-    return 0;
+    prims();
 }
