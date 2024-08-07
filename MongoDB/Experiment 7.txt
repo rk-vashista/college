@@ -1,0 +1,224 @@
+Experiment 7
+
+7a. Find all listings with listing_url, name, address, host_picture_url in the listings And Reviews
+collection that have a host with a picture url
+
+Database:Listing
+Collection: URL
+
+Database
+ db.url.insertMany([
+  {
+    listing_url: "http://www.example.com/listing/123456",
+    name: "Beautiful Apartment",
+    address: {
+      street: "123 Main Street",
+      suburb: "Central",
+      city: "Metropolis",
+      country: "Wonderland"
+    },
+    host: {
+      name: "Alice",
+      picture_url: "http://www.example.com/images/host/host123.jpg"
+    }
+  },
+  {
+    listing_url: "http://www.example.com/listing/654321",
+    name: "Cozy Cottage",
+    address: {
+      street: "456 Another St",
+      suburb: "North",
+      city: "Smallville",
+      country: "Wonderland"
+    },
+    host: {
+      name: "Bob",
+      picture_url: ""
+    }
+  },
+  {
+    listing_url: "http://www.example.com/listing/789012",
+    name: "Modern Condo",
+    address: {
+      street: "789 Side Road",
+      suburb: "East",
+      city: "Gotham",
+      country: "Wonderland"
+    },
+    host: {
+      name: "Charlie",
+      picture_url: "http://www.example.com/images/host/host789.jpg"
+    }
+  }
+])
+*******************************************************************
+Query:
+
+db.url.find(
+  {
+    "host.picture_url": { $exists: true, $ne: "" }
+  },
+  {
+    listing_url: 1,
+    name: 1,
+    address: 1,
+    "host.picture_url": 1
+  }
+)
+********************************************************************
+Query Explanation:
+
+Query Filter:
+"host.picture_url": { $exists: true, $ne: "" }: This part of the query ensures that only documents where the host.picture_url field exists and is not an empty string are selected.
+
+
+Projection:
+{ listing_url: 1, name: 1, address: 1, "host.picture_url": 1 }: This part of the query specifies the fields to include in the output. The 1 indicates that these fields should be included.
+
+***********************************************************************
+
+Query Output:
+
+{
+  "_id": ObjectId("..."),
+  "listing_url": "http://www.example.com/listing/123456",
+  "name": "Beautiful Apartment",
+  "address": {
+    "street": "123 Main Street",
+    "suburb": "Central",
+    "city": "Metropolis",
+    "country": "Wonderland"
+  },
+  "host": {
+    "picture_url": "http://www.example.com/images/host/host123.jpg"
+  }
+}
+{
+  "_id": ObjectId("..."),
+  "listing_url": "http://www.example.com/listing/789012",
+  "name": "Modern Condo",
+  "address": {
+    "street": "789 Side Road",
+    "suburb": "East",
+    "city": "Gotham",
+    "country": "Wonderland"
+  },
+  "host": {
+    "picture_url": "http://www.example.com/images/host/host789.jpg"
+  }
+}
+*************************END*****************************************
+
+7B. Using E-commerce collection write a query to display reviews summary.
+
+Database: Ecommerce
+Collection: Products
+
+Database:-
+
+db.products.insertMany([
+  {
+    product_id: 1,
+    name: "Laptop",
+    category: "Electronics",
+    price: 1200,
+    reviews: [
+      { user: "Alice", rating: 5, comment: "Excellent!" },
+      { user: "Bob", rating: 4, comment: "Very good" },
+      { user: "Charlie", rating: 3, comment: "Average" }
+    ]
+  },
+  {
+    product_id: 2,
+    name: "Smartphone",
+    category: "Electronics",
+    price: 800,
+    reviews: [
+      { user: "Dave", rating: 4, comment: "Good phone" },
+      { user: "Eve", rating: 2, comment: "Not satisfied" },
+      { user: "Frank", rating: 5, comment: "Amazing!" }
+    ]
+  },
+  {
+    product_id: 3,
+    name: "Headphones",
+    category: "Accessories",
+    price: 150,
+    reviews: [
+      { user: "Grace", rating: 5, comment: "Great sound" },
+      { user: "Heidi", rating: 3, comment: "Okay" }
+    ]
+  }
+])
+************************************************************************
+Query:
+
+db.products.aggregate([
+  {
+    $unwind: "$reviews"
+  },
+  {
+    $group: {
+      _id: "$name",
+      totalReviews: { $sum: 1 },
+      averageRating: { $avg: "$reviews.rating" },
+      comments: { $push: "$reviews.comment" }
+    }
+  },
+  {
+    $project: {
+      _id: 0,
+      product: "$_id",
+      totalReviews: 1,
+      averageRating: 1,
+      comments: 1
+    }
+  }
+])
+***********************************************************************
+Query Explanation:
+
+$unwind: Deconstructs the reviews array from each document to output a document for each element.
+
+$group: Groups the documents by product name, and calculates:
+totalReviews: The total number of reviews for each product.
+averageRating: The average rating of the reviews for each product.
+comments: An array of all review comments for each product.
+
+$project: Restructures the output documents to include the product name, total reviews, average rating, and comments.
+
+**************************************************************************
+Query Output:-
+
+[
+  {
+    "product": "Laptop",
+    "totalReviews": 3,
+    "averageRating": 4,
+    "comments": [
+      "Excellent!",
+      "Very good",
+      "Average"
+    ]
+  },
+  {
+    "product": "Smartphone",
+    "totalReviews": 3,
+    "averageRating": 3.6666666666666665,
+    "comments": [
+      "Good phone",
+      "Not satisfied",
+      "Amazing!"
+    ]
+  },
+  {
+    "product": "Headphones",
+    "totalReviews": 2,
+    "averageRating": 4,
+    "comments": [
+      "Great sound",
+      "Okay"
+    ]
+  }
+]
+********************************************************************

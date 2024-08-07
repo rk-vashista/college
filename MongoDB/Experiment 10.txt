@@ -1,0 +1,118 @@
+10. Develop an aggregation pipeline to illustrate Text search on Catalog data collection.
+
+Database name:Kannada Movie
+Collection:catalog
+
+Step 1: Create a Database
+Database:-
+db.catalog.insertMany([{
+    name: 'Jayammana Maga',
+    year: 2013,
+    duration: '139 min',
+    rating: 7.1,
+    genre: 'Drama',
+    lang: 'kannada'
+  },
+  {
+    name: 'Rajannana Maga',
+    year: 2018,
+    duration: '143 min',
+    rating: 7.8,
+    genre: 'Action',
+    lang: 'kannada'
+  },
+  {
+    name: 'Thayige thakka maga',
+    year: 2018,
+    duration: '147 min',
+    rating: 5.4,
+    genre: 'Drama',
+    lang: 'kannada'
+  },
+  {
+    name: 'Bhootayyana Maga Ayyu',
+    year: 1974,
+    duration: '155 min',
+    rating: 8.3,
+    genre: 'Drama',
+    lang: 'kannada'
+  },
+  {
+    name: 'Jaga Mechida Maga',
+    year: 1972,
+    duration: '153 min',
+    rating: 8.2,
+    genre: 'Drama',
+    lang: 'kannada'
+  },
+  {
+    name: 'Daari Tappida Maga',
+    year: 1975,
+    duration: '138 min',
+    rating: 7.6,
+    genre: 'Crime', 
+    lang: 'kannada'
+  },
+  {
+    name: 'Raju Kannada Medium',
+    year: 2018,
+    duration: '159 min',
+    rating: 7.2,
+    genre: 'Comedy',
+    lang: 'kannada'
+  },
+  {
+    name: 'First Rank Raju',
+    year: 2015,
+    duration: '148 min',
+    rating: 7.8,
+    genre: 'Comedy',
+    lang: 'kannada'
+  }])
+*******************************************************************************************
+The aggregation framework in  MongoDB is a powerful tool for data processing and transformation. It consists of a series of stages, each stage performing an operation on the input documents and passing the results to the next stage. This sequence of operations is called an aggregation pipeline.
+
+Here is a step-by-step guide to using the aggregation pipeline in  MongoDB, with examples of various stages such as $match, $group, $sort, $project, $skip, and others.
+
+Example Aggregation Pipeline
+
+****************************************************************************************************************
+Let’s create an aggregation pipeline that includes various stages:
+
+$match: Filter documents to include only those in the year 2018.
+$group: Group documents by genre and calculate the average rating for each genre.
+$sort: Sort the results by avgRating in descending order.
+$project: Include specific fields in the output
+$limit: Limit the output to 3 results.
+
+***************************************************************************************************************
+Query:-
+
+db.catalog.aggregate([
+  {$match:{year :2018}}, 
+  {$group:{_id: "$genre", avgRating:{$avg: "$rating"}}}, 
+  {$sort: {avgRating:-1}},
+  {$project:{year:"$year", avgRating:1, genre:1} }, 
+  {$limit:3} ])
+
+**************************************************************************************************************
+Output:-
+{
+  _id: 'Action',
+  avgRating: 7.8
+}
+{
+  _id: 'Comedy',
+  avgRating: 7.2
+}
+{
+  _id: 'Drama',
+  avgRating: 5.4
+}
+
+********************************************END *******************************************************************
+
+
+
+
+

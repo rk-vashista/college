@@ -1,0 +1,183 @@
+Experiment 8
+
+8a. Demonstrate creation of different types of indexes on collection (unique, sparse, compound and
+multikey indexes)
+
+Database: Index
+Collection name: Scores
+
+1. Unique Index
+A unique index ensures that the indexed field does not contain duplicate values.
+
+Database: Index
+Collection: Students
+
+db.students.insertMany([
+   { "name": "Meredith", "age": 12 },
+   { "name": "Olivia", "age": 11 },
+   { "name": "Benjamin" }
+])
+
+
+Query:-
+
+db.students.createIndex(
+   {
+      "name": 1,
+      "age": -1,
+      "grade": 1
+   },
+   { unique: true }
+)
+
+If the collection does not already contain identical documents, the unique compound index allows the insertion of the following documents that are all missing the grade field.
+
+However, you cannot insert a document that has the same index key (value for name, age, and grade) as another document in the collection.
+
+
+db.students.insertOne( { name: "Meredith", age: 12 } )
+
+The operation fails to insert the document because of the violation of the unique constraint on the values of the fields name, age, and grade:
+
+Output:-
+WriteResult({
+   "nInserted" : 0,
+   "writeError" : {
+      "code" : 11000,
+      "errmsg" :
+         "E11000 duplicate key error collection: test.students
+         index: name_1_age_-1_grade_1
+         dup key: { name: "Meredith", age: 12, grade: null }
+   }
+} )
+
+****************************************************************************************************************
+2. Sparse Index
+A sparse index only includes documents that contain the indexed field, ignoring documents where the field is missing.
+
+Database:
+db.scores.insertMany([{ "_id" : ObjectId("523b6e32fb408eea0eec2647"), "userid" : "newbie" },
+{ "_id" : ObjectId("523b6e61fb408eea0eec2648"), "userid" : "abby", "score" : 82 },
+{ "_id" : ObjectId("523b6e6ffb408eea0eec2649"), "userid" : "nina", "score" : 90 }])
+
+
+Query:-
+The collection has a sparse index on the field score:
+
+db.scores.createIndex( { score: 1 } , { sparse: true } )
+
+Then, the following query on the scores collection uses the sparse index to return the documents that have the score field less than ($lt) 90:
+
+1 db.scores.find( { score: { $lt: 90 } } )
+
+output:-
+{
+  _id: ObjectId('523b6e61fb408eea0eec2648'),
+  userid: 'abby',
+  score: 82
+}
+
+2  db.scores.find().sort( { score: -1 } )
+Decending Order
+
+{
+  _id: ObjectId('523b6e6ffb408eea0eec2649'),
+  userid: 'nina',
+  score: 90
+}
+{
+  _id: ObjectId('523b6e61fb408eea0eec2648'),
+  userid: 'abby',
+  score: 82
+}
+{
+  _id: ObjectId('523b6e32fb408eea0eec2647'),
+  userid: 'newbie'
+}
+****************************************************************************
+3. Multi key Index: A multikey index is created on an array field, indexing each element of the array.
+
+Database: Index
+Collection: Match
+
+db.match.insertMany( [
+   { name: "joe", event: ["open", "tournament"] },
+   { name: "bill", event: ["match", "championship"] }
+] )
+
+Query:-
+db.match.createIndex( { name: 1, event: 1 } )
+db.match.find( { name: "bill" } )
+
+Output:-
+{
+  _id: ObjectId('668d0370720da9eacb2a0c6b'),
+  name: 'bill',
+  event: [
+    'match',
+    'championship'
+  ]
+}
+*****************************************************************************************
+
+4. Compound Index
+A compound index indexes multiple fields within a single index.
+
+db.match.createIndex( { name: 1, event: 1 } )
+
+*******************************************************************************************
+
+8b. Demonstrate optimization of queries using indexes.
+
+
+Optimization of Queries Using Indexes:
+
+Optimizing queries involves identifying which fields are commonly used in queries and creating indexes on those fields. Let's consider a scenario where we have a collection of books and we frequently query based on the author's name and the publication year.
+
+Database: Index
+Collection:Books
+
+db.Books.insertMany( [
+   { author: "joe", publication:2005 },
+   { author: "bill",publication:2009 },{author:"Sree",publication:2010}
+] )
+
+
+// Create indexes
+db.Books.createIndex({ "author": 1 })
+db.Books.createIndex({ "publication": 1 })
+
+// Query optimization
+
+// Example 1: Query by author
+db.Books.find({ "author": "Sree" })
+
+// Example 2: Query by publication year
+db.Books.find({ "publication": 2010 })
+
+// Example 3: Query by both author and publication year
+db.Books.find({ "author": "Sree", "publication": 2010 })
+
+In the above examples, we create indexes on the fields "author" and "publication_year". These indexes will significantly speed up queries that involve filtering by these fields.
+
+When executing queries, MongoDB's query optimizer will automatically select the most efficient index to use based on the query predicates. By creating appropriate indexes, we can ensure that queries execute efficiently, improving overall database performance.
+
+Output:
+{
+  _id: ObjectId('668d0de1720da9eacb2a0c75'),
+  author: 'Sree',
+  publication: 2010
+}
+
+*****************************************************************************************************
+
+
+
+
+
+
+
+
+
+
+

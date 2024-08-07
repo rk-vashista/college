@@ -1,0 +1,35 @@
+Database
+
+db.inventory.insertMany( [
+   { "item": "Pens", "quantity": 350, "tags": [ "school", "office" ] },
+   { "item": "Erasers", "quantity": 15, "tags": [ "school", "home" ] },
+   { "item": "Maps", "tags": [ "office", "storage" ] },
+   { "item": "Books", "quantity": 5, "tags": [ "school", "storage", "home" ] }
+] )
+
+
+Comparision Operator
+
+1. $eq : Matches values that are equal to a specified value.
+db.daily.find({ quantity: { $eq: 5 } })
+
+2. $gt: Matches values that are greater than a specified value.
+db.daily.find({ quantity: { $gt: 15 } })
+
+3.$gte: Matches values that are greater than or equal to a specified value.
+db.daily.find({ quantity: { $gte: 15 } })
+
+4.$in: Matches any of the values specified in an array.
+db.daily.find( { quantity: { $in: [ 5,15 ] } }, { _id: 0 } )
+
+5.$lt: Matches values that are less than a specified value.
+db.daily.find( { quantity: { $lt: 20 } } )
+
+6. $lte: Matches values that are less than or equal to a specified value.
+db.daily.find( { quantity: { $lte: 15 } } )
+
+7. $ne: Matches all values that are not equal to a specified value.
+db.daily.find( { quantity: { $ne: 20 } } )
+
+8. $nin: Matches none of the values specified in an array.
+db.daily.find( { quantity: { $nin: [ 5, 15 ] } }, { _id: 0 } )

@@ -1,0 +1,23 @@
+Database: Product
+Collection Name:inventory
+
+db.inventory.insertMany([{ _id: 1, item: { name: "ab", code: "123" }, qty: 15, tags: [ "A", "B", "C" ] },
+{ _id: 2, item: { name: "cd", code: "123" }, qty: 20, tags: [ "B" ] },
+{ _id: 3, item: { name: "ij", code: "456" }, qty: 25, tags: [ "A", "B" ] },
+{ _id: 4, item: { name: "xy", code: "456" }, qty: 30, tags: [ "B", "A" ] },
+{ _id: 5, item: { name: "mn", code: "000" }, qty: 20, tags: [ [ "A", "B" ], "C" ] }])
+
+AND Operation
+
+db.inventory.find({$and:[{qty:{$gt:15}},{tags:'B'}]})
+
+OR Operation
+
+db.inventory.find({$or:[{qty:{$gt:20}},{tags:'B'}]})
+
+NOT Operation
+db.inventory.find({qty:{$not:{$gt:20}}})
+
+
+NOR Operation
+db.inventory.find({$nor:[{qty:{$gt:20}},{tags:'A'}]})

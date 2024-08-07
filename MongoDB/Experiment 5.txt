@@ -1,0 +1,157 @@
+Experiment 5
+
+Execute Aggregation operations ($avg, $min,$max, $push, $addToSet etc.). students
+encourage to execute several queries to demonstrate various aggregation operators)
+
+Database:BMSIT
+Collection: Students
+
+db.students.insertOne({_id:1,name:'john',age:20,garde:'A'})
+db.students.insertOne({_id:2,name:'sree',age:36,garde:'B'})
+db.students.insertOne({_id:3,name:'sushma',age:25,garde:'C'})
+db.students.insertOne({_id:4,name:'Raju',age:27,garde:'B+'})
+db.students.insertOne({_id:5,name:'Priya',age:23,garde:'A'})
+
+**************************************************************
+1. $avg Command
+
+$avg: Calculates the average age of all students.
+
+Query:
+
+db.students.aggregate([
+{
+$group: {
+_id: null,
+averageAge: { $avg: '$age' }
+}
+}
+])
+
+
+Output
+{
+  _id: null,
+  averageAge: 26.2
+}
+*****************************************************************
+2. $min: Finds the minimum age among all students.
+
+Query:
+
+db.students.aggregate([
+{
+$group: {
+_id: null,
+minAge: { $min: '$age' }
+}
+}
+])
+
+Output:
+
+{
+  _id: null,
+  minAge: 20
+}
+
+***********************************************************************
+3. $max: Finds the maximum age among all students.
+
+Query:
+
+db.students.aggregate([
+{
+$group: {
+_id: null,
+minAge: { $max: '$age' }
+}
+}
+])
+
+output:
+{
+  _id: null,
+  minAge: 36
+}
+
+********************************************************************
+4. $push: Groups students by their grades and pushes their names into an array for
+each grade.
+
+Query1 :
+
+db.students.aggregate([
+{
+$group: {
+_id: '$grade',
+students: { $push:'$name' }
+}
+}
+])
+
+output:
+{
+  _id: null,
+  students: [
+    'john',
+    'sree',
+    'sushma',
+    'Raju',
+    'Priya'
+  ]
+}
+
+query 2:
+
+db.students.aggregate([
+{
+$group: {
+_id: '$grade',
+students: { $push:'$age' }
+}
+}
+])
+
+
+Output:
+{
+  _id: null,
+  students: [
+    20,
+    36,
+    25,
+    27,
+    23
+  ]
+}
+
+***********************************************************
+5. $addToSet: Similar to $push, but ensures unique values in the resulting array.
+
+Query:
+
+db.students.aggregate([
+{
+$group: {
+_id:'$grade',
+uniqueStudents: { $addToSet:'$name' }
+}
+}
+])
+
+Output:
+
+{
+  _id: null,
+  uniqueStudents: [
+    'sree',
+    'sushma',
+    'Priya',
+    'john',
+    'Raju'
+  ]
+}
+
+*********** END ************************END*******************
+
