@@ -5,7 +5,11 @@
 void printSubset( int subset[], int subsetSize) {
     printf("{ ");
     for (int i = 0; i < subsetSize; i++) {
+        if(i==subsetSize-1){
         printf("%d ", subset[i]);
+        break;
+        }
+        printf("%d , ", subset[i]);
     }
     printf("}\n");
 }
