@@ -28,15 +28,12 @@ void floydWarshall(int graph[V][V]) {
     printf("Shortest distances between every pair of vertices:\n");
     for (i = 0; i < V; i++) {
         for (j = 0; j < V; j++) {
-            if (dist[i][j] == 999) {
-                printf("999 ");
-            } else {
                 printf("%d ", dist[i][j]);
             }
+            printf("\n");
         }
-        printf("\n");
     }
-}
+
 
 int main() {
 
@@ -48,13 +45,7 @@ int main() {
             scanf("%d",&graph[i][j]);
         }
     }
-    // int graph[V][V] = {
-    //     {999, 8, 4, 999},
-    //     {999, 999, 1, 999},
-    //     {4, 999, 999, 999},
-    //     {999, 2, 9, 999}
-    // };
-
+ 
     floydWarshall(graph);
 
     return 0;
