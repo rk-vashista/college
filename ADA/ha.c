@@ -4,7 +4,7 @@ int cost[10][10], n;
 
 void kruskal()
 {
-    int parent[10], ne = 0, mincost=0;
+    int parent[10], ne = 0, mincost = 0;
 
     for (int i = 0; i < n; i++)
         parent[i] = -1;
