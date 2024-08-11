@@ -2,13 +2,14 @@
 #include <stdlib.h>
 #include <time.h>
 
+#define MAX_SIZE 100000 // Define a maximum array size
+
 // Function to merge two subarrays of arr[]
 void merge(int arr[], int l, int m, int r) {
     int n1 = m - l + 1;
     int n2 = r - m;
-
-    int *L = (int *)malloc(n1 * sizeof(int));
-    int *R = (int *)malloc(n2 * sizeof(int));
+    
+    int L[MAX_SIZE], R[MAX_SIZE]; // Fixed-size arrays
 
     for (int i = 0; i < n1; i++)
         L[i] = arr[l + i];
@@ -26,9 +27,6 @@ void merge(int arr[], int l, int m, int r) {
 
     while (i < n1) arr[k++] = L[i++];
     while (j < n2) arr[k++] = R[j++];
-
-    free(L);
-    free(R);
 }
 
 // Function to implement Merge Sort
@@ -53,19 +51,15 @@ void printArray(int arr[], int n) {
 
 int main() {
     int n;
-    printf("Enter the number of elements (n > 5000): ");
+    printf("Enter the number of elements (n > 5000, max %d): ", MAX_SIZE);
     scanf("%d", &n);
 
-    if (n <= 5000) {
-        printf("Number of elements must be greater than 5000.\n");
+    if (n <= 5000 || n > MAX_SIZE) {
+        printf("Number of elements must be greater than 5000 and less than or equal to %d.\n", MAX_SIZE);
         return 1;
     }
 
-    int *arr = (int *)malloc(n * sizeof(int));
-    if (arr == NULL) {
-        printf("Memory allocation failed.\n");
-        return 1;
-    }
+    int arr[MAX_SIZE]; // Fixed-size array
 
     srand(time(NULL));
     for (int i = 0; i < n; i++) {
@@ -77,11 +71,10 @@ int main() {
     clock_t end = clock();
 
     double time_taken = (double)(end - start) / CLOCKS_PER_SEC;
-    printf("Time taken to sort %d elements: %f seconds\n", n, time_taken);
-
+   
     printf("Sorted array:\n");
     printArray(arr, n);
 
-    free(arr);
+    printf("Time taken to sort %d elements: %f seconds\n", n, time_taken);
     return 0;
 }
