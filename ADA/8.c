@@ -32,7 +32,7 @@ void findSubsetsWithSum(int arr[], int n, int sum, int subset[], int subsetSize)
 }
 
 int main() {
-    int n, d;
+    int n, sum;
 
     printf("Enter the number of integers: ");
     scanf("%d", &n);
@@ -44,11 +44,11 @@ int main() {
     }
 
     printf("Enter the target sum: ");
-    scanf("%d", &d);
+    scanf("%d", &sum);
 
     int subset[n];  // Array to hold the current subset
     printf("Subsets with the given sum:\n");
-    findSubsetsWithSum(arr, n, d, subset, 0);
+    findSubsetsWithSum(arr, n, sum, subset, 0);
 
     return 0;
 }
