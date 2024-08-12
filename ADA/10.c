@@ -66,12 +66,12 @@ int main() {
     quickSort(arr, 0, n - 1);
     clock_t end = clock();
 
+    double time_taken = (double)(end - start) / CLOCKS_PER_SEC;
+    printf("Time taken to sort %d elements: %f seconds\n", n, time_taken);
+
     // Print the sorted array
     printf("Sorted array:\n");
     printArray(arr, n);
-
-    double time_taken = (double)(end - start) / CLOCKS_PER_SEC;
-    printf("Time taken to sort %d elements: %f seconds\n", n, time_taken);
 
     return 0;
 }
