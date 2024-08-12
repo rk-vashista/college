@@ -3,25 +3,25 @@
 #include <time.h>
 
 // Function to swap two elements
-void swap(int *a, int *b) {
-    int temp = *a;
-    *a = *b;
-    *b = temp;
+void swap(int a[], int i, int j) {
+    int temp = a[i];
+    a[i] = a[j];
+    a[j] = temp;
 }
 
 // Partition function for Quick Sort
 int partition(int arr[], int low, int high) {
     int pivot = arr[high];
-    int i = (low - 1);
+    int i = low - 1;
 
     for (int j = low; j <= high - 1; j++) {
         if (arr[j] < pivot) {
             i++;
-            swap(&arr[i], &arr[j]);
+            swap(arr, i, j);
         }
     }
-    swap(&arr[i + 1], &arr[high]);
-    return (i + 1);
+    swap(arr, i + 1, high);
+    return i + 1;
 }
 
 // Quick Sort function
@@ -37,7 +37,7 @@ void quickSort(int arr[], int low, int high) {
 void printArray(int arr[], int n) {
     for (int i = 0; i < n; i++) {
         printf("%d ", arr[i]);
-        if ((i + 1) % 20 == 0) // Print 20 elements per line for better readability
+        if ((i + 1) % 20 == 0)
             printf("\n");
     }
     printf("\n");
@@ -53,16 +53,12 @@ int main() {
         return 1;
     }
 
-    int *arr = (int *)malloc(n * sizeof(int));
-    if (arr == NULL) {
-        printf("Memory allocation failed.\n");
-        return 1;
-    }
+    int arr[n];
 
     // Generate random integers and fill the array
-    srand(time(NULL)); // Seed for random number generation
+    srand(time(NULL)); 
     for (int i = 0; i < n; i++) {
-        arr[i] = rand() % 10000; // Random integers between 0 and 9999
+        arr[i] = rand() % 10000;
     }
 
     // Measure the time taken for sorting
@@ -70,13 +66,12 @@ int main() {
     quickSort(arr, 0, n - 1);
     clock_t end = clock();
 
-    double time_taken = (double)(end - start) / CLOCKS_PER_SEC;
-    printf("Time taken to sort %d elements: %f seconds\n", n, time_taken);
-
     // Print the sorted array
     printf("Sorted array:\n");
     printArray(arr, n);
 
-    free(arr);
+    double time_taken = (double)(end - start) / CLOCKS_PER_SEC;
+    printf("Time taken to sort %d elements: %f seconds\n", n, time_taken);
+
     return 0;
 }
