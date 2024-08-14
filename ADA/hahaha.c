@@ -1,55 +1,85 @@
 #include <stdio.h>
 #include <stdbool.h>
+#define MAX 20
 
-void printSubset(int subset[], int subsetSize)
+int board[MAX][MAX];
+
+int solutionCount=0;
+void printBoard( int n)
 {
-    printf("{");
-    for (int i = 0; i < subsetSize; i++)
+    int i, j;
+    printf("Solution %d: \n",++solutionCount);
+    for (i = 0; i < n; i++)
     {
-        if (i == subsetSize - 1)
+        for (j = 0; j < n; j++)
         {
-            printf("%d } \n", subset[i]);
-            break;
+            if (board[i][j] == 1)
+            {
+                printf(" Q ");
+            }
+            else
+            {
+                printf(" . ");
+            }
         }
-        printf("%d , ", subset[i]);
+        printf("\n");
     }
+    printf("\n");
 }
 
-void findSubsets(int arr[], int n, int sum, int subset[], int subsetSize)
-{
+bool isSafe(int borad[MAX][MAX], int row, int col, int n){
 
-    if (sum == 0)
-    {
-        printSubset(subset, subsetSize);
+    for(int i=0;i<n;i++){
+        if(board[i][col]==1)
+        return false;
+    }
+
+    for(int i=row,j=col;i>=0,j>=0;i--,j--){
+        if(board[i][j]==1)
+        return false;
+    }
+
+    for(int i=row,j=col;i>=0,j<n;i--,j++){
+        if(board[i][j]==1)
+        return false;
+    }
+
+    return true;
+}
+
+
+void Qween(int board[MAX][MAX], int row, int n){
+    if(row>=n){
+        printBoard(n);
         return;
     }
 
-    if (n == 0 || sum < 0)
-        return;
+    for(int col=0;col<n;col++){
+        if(isSafe(board,row,col,n))
+        {
+            board[row][col]=1;
 
-    findSubsets(arr, n - 1, sum, subset, subsetSize);
-    subset[subsetSize] = arr[n - 1];
-    findSubsets(arr, n - 1, sum - arr[n - 1], subset, subsetSize + 1);
+            Qween(board,row+1,n);
+
+            board[row][col]=0;
+        }
+    }
 }
 
-void main()
-{
-    int n, d;
+void main(){
+    printf("ENter the number of queens:\n");
+    int n;
+    scanf("%d",&n);
 
-    printf("Enter the number of integers: ");
-    scanf("%d", &n);
-
-    int arr[n];
-    printf("Enter the integers:\n");
-    for (int i = 0; i < n; i++)
-    {
-        scanf("%d", &arr[i]);
+    for(int i=0;i<n;i++){
+        for(int j=0;j<n;j++){
+            board[i][j]=0;
+        }
     }
 
-    printf("Enter the target sum: ");
-    scanf("%d", &d);
+    Qween(board,0,n);
 
-    int subset[n]; // Array to hold the current subset
-    printf("Subsets with the given sum:\n");
-    findSubsets(arr, n, d, subset, 0);
+    if(solutionCount==0){
+        printf("No solution");
+    }
 }
